@@ -1,0 +1,38 @@
+version: "3.7"
+
+services:
+
+  boa:
+    image: registry.gitlab.com/wit-id/ptpr-agent-app-dashboard:main
+    ports: 
+      - "3000"
+    networks: 
+      - app_nw
+    restart: always
+      
+  api:
+    image: registry.gitlab.com/wit-id/agent-app-api:master
+    ports: 
+      - "8080"
+    networks: 
+      - app_nw
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 3000:3000
+      - 8080:8080
+    networks:
+      - app_nw
+    depends_on: 
+      - api
+      - boa
+
+networks:
+  app_nw:
+    driver: bridge
